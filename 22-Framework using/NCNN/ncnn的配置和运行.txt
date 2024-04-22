@@ -1,0 +1,62 @@
+1.进入你的工作目录
+
+  cd ~/work
+
+2.从github上同步下载NCNN代码
+
+  git clone https://github.com/Tencent/ncnn.git
+
+3.修改配置文件
+
+  cd ncnn
+  mkdir build && cd build
+  cmake ..
+  make -j(此过程中可能会生成warning，不会影响程序运行)
+  make install
+
+4.编译NCNN自带例程
+
+  4.1 进入examples目录，并在此目录下新建一个makefile文件
+
+   cd ../examples/
+
+  4.2 打开makefile文件并在此文件中输入如下内容：
+
+   NCNN = /home/****/work/ncnn(****表示你的个人目录)
+
+   OPENCV = /home/zhluo/tool/opencv-2.4.9/opencv-2.4.9
+
+   INCPATH =       -I${NCNN}/build/install/include \
+                   -I${OPENCV}/modules/objdetect/include \
+                   -I${OPENCV}/modules/highgui/include \
+                   -I${OPENCV}/modules/imgproc/include \
+                   -I${OPENCV}/modules/core/include
+
+   LIBS = -lopencv_core -lopencv_highgui -lopencv_imgproc  \
+                   -fopenmp -pthread
+ 
+   LIBPATH = -L${OPENCV}/build/lib
+
+   %:%.cpp
+           $(CXX) $(INCPATH) $(LIBPATH) $^ ${NCNN}/build/install/lib/libncnn.a $(LIBS) -o $@
+
+  4.3 保存并关闭makefile文件，在此目录下运行
+
+   make squeezenet	
+
+  4.4 在此目录下准备一张用来test的图片test.jpg，执行如下命令就可得到分类结果
+
+   ./squeezenet test.jpg
+
+5.将已经训练好的caffemodel转换成NCNN的model
+
+  5.1 进入你的caffe目录，将caffemodel升级为最新版本
+
+   ./build/tools/upgrade_net_proto_text models/bvlc_alexnet/deploy.prototxt new_deploy.prototxt
+   ./build/tools/upgrade_net_proto_binary models/bvlc_alexnet/bvlc_alexnet.caffemodel new_bvlc_alexnet.caffemodel
+
+  5.2 将new_deploy.prototxt和new_bvlc_alexnet.caffemodel拷贝到ncnn/build/tools/下，然后执行
+
+   ./caffe2ncnn new_deploy.prototxt new_bvlc_alexnet.caffemodel alexnet.param alexnet.bin
+
+   在此目录下会生成alexnet.param和alexnet.bin两个文件,运行参考例程 squeezenet的运行。

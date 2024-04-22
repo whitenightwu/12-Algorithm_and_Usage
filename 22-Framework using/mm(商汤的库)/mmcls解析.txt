@@ -1,0 +1,1 @@
+RandAugment：是一张张进行的增广（每一次都是独立的），并不是每一个epoch或者iteration公用同一套aug设置。例如num_policies为2时，同一个batch中，第一张图片随机选择2个aug，第二张再次随机选择2个aug。

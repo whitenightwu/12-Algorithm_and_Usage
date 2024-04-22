@@ -1,0 +1,5 @@
+最好的方式是去官网看推荐版本和配置！！！
+
+tensorflow 1.14和bazel 0.20以上都不能碰
+Bazel 0.24把jni的定义都删掉了，自己又不能通过绝对路径依赖jni.h，只能依赖build里定义的library，于是要把jni.h和jni_md.h做成一个bazel library（但这个怎么做没有人知道）。
+于是乎，bazel0.24会很麻烦，只能直接降成0.20，此时local_jdk的关键字还管用。
